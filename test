@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Set PYTHONPATH to include the src directory
+export PYTHONPATH=$(pwd)/src
+
+# Run pytest with coverage
+pytest --cov=src --cov-report=term-missing > pytest_output.txt
+
+# Print full output for debugging
+#echo "Pytest Output:"
+cat pytest_output.txt
+
+# Extract the number of tests passed and total tests
+TOTAL_TESTS=$(grep -oE 'collected [0-9]+' pytest_output.txt | grep -oE '[0-9]+')
+PASSED_TESTS=$(grep -oE '[0-9]+ passed' pytest_output.txt | grep -oE '[0-9]+')
+
+# Calculate pass rate if both variables are not empty
+if [[ -n $TOTAL_TESTS && -n $PASSED_TESTS ]]; then
+    PASS_RATE=$(echo "scale=2; $PASSED_TESTS / $TOTAL_TESTS * 100" | bc)
+else
+    PASS_RATE=0
+fi
+
+# Capture the coverage rate directly from pytest output
+COVERAGE_RATE=$(grep "TOTAL" pytest_output.txt | awk '{print $4}')
+
+# Output the pass and coverage rates
+echo "passing: ${PASS_RATE}%"
+echo "coverage: ${COVERAGE_RATE}"

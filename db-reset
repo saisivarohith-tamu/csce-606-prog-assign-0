@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "{}" > data.json
+echo "{}" > sessions.json
